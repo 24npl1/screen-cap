@@ -1,71 +1,53 @@
-import React, { useState } from 'react';
-import Toolbar from './Toolbar';
-import ToolbarToggle from './ToolbarToggle';
-import DrawingCanvas from './DrawingCanvas';
-import { ToolType, ShapeType, DrawableElement } from '../types';
+import React, { useState } from 'react'
+import { ToolType, ShapeType } from '../types'
+import DrawingCanvas from './canvas/DrawingCanvas'
+import Toolbar from './toolbar/Toolbar'
+import ToolbarToggle from './toolbar/ToolbarToggle'
 
 const App: React.FC = () => {
-  const [toolbarVisible, setToolbarVisible] = useState<boolean>(true);
-  const [activeTool, setActiveTool] = useState<ToolType>('shape');
-  const [activeShape, setActiveShape] = useState<ShapeType>('rectangle');
-  const [activeColor, setActiveColor] = useState<string>('#FF0000');
+  const [toolbarVisible, setToolbarVisible] = useState(true)
+  const [activeTool, setActiveTool] = useState<ToolType>(ToolType.Shape)
+  const [activeShape, setActiveShape] = useState<ShapeType>(ShapeType.Rectangle)
+  const [activeColor, setActiveColor] = useState('#000000')
 
   const toggleToolbar = (): void => {
-    const newVisibility = !toolbarVisible;
-    setToolbarVisible(newVisibility);
-    window.electronAPI.toggleToolbar(newVisibility);
-  };
-
-  const handleToolSelect = (tool: ToolType): void => {
-    setActiveTool(tool);
-  };
-
-  const handleShapeSelect = (shape: ShapeType): void => {
-    setActiveShape(shape);
-  };
-
-  const handleColorSelect = (color: string): void => {
-    setActiveColor(color);
-  };
+    const newVisibility = toolbarVisible == null
+    setToolbarVisible(newVisibility)
+    window.electronAPI.toggleToolbar(newVisibility)
+  }
 
   const handleClearCanvas = (): void => {
-    // This will be implemented in the DrawingCanvas component
-    // We'll use a ref to trigger a clear action
-    const event = new CustomEvent('clear-canvas');
-    document.dispatchEvent(event);
-  };
-  
-  const handleAddCenterTextBox = (): void => {
-    // Create a text box in the center of the screen
-    const event = new CustomEvent('add-center-text');
-    document.dispatchEvent(event);
-    
-    // Switch to text tool
-    setActiveTool('text');
-  };
+    const event = new CustomEvent('clear-canvas')
+    document.dispatchEvent(event)
+  }
 
-  const handleElementSelect = (element: DrawableElement | null): void => {
-    // This function is for future implementation of element selection operations
-    console.log('Element selected:', element?.id);
-  };
+  const handleAddCenterText = (): void => {
+    const event = new CustomEvent('add-center-text')
+    document.dispatchEvent(event)
+  }
+
+  const handleElementSelect = (element: any): void => {
+    console.log('Selected element:', element)
+  }
 
   return (
-    <div className="app-container">
-      <Toolbar 
-        isVisible={toolbarVisible}
-        activeTool={activeTool}
-        activeShape={activeShape}
-        activeColor={activeColor}
-        onToolSelect={handleToolSelect}
-        onShapeSelect={handleShapeSelect}
-        onColorSelect={handleColorSelect}
-        onClearCanvas={handleClearCanvas}
-        onAddCenterText={handleAddCenterTextBox}
-      />
-      <div className="window-content">
-        <ToolbarToggle 
-          isToolbarVisible={toolbarVisible} 
-          onToggleToolbar={toggleToolbar} 
+    <div className="app">
+      <div className="titlebar">
+        <div className="titlebar-drag-region" />
+        <div className="window-title">Screen Cap</div>
+      </div>
+      <div className="main-content">
+        <ToolbarToggle isToolbarVisible={toolbarVisible} onToggleToolbar={toggleToolbar} />
+        <Toolbar
+          isVisible={toolbarVisible}
+          activeTool={activeTool}
+          activeShape={activeShape}
+          activeColor={activeColor}
+          onToolSelect={setActiveTool}
+          onShapeSelect={setActiveShape}
+          onColorSelect={setActiveColor}
+          onClearCanvas={handleClearCanvas}
+          onAddCenterText={handleAddCenterText}
         />
         <DrawingCanvas
           activeTool={activeTool}
@@ -75,7 +57,7 @@ const App: React.FC = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

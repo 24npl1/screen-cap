@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "keywords": [],
   "author": {
@@ -35,9 +36,12 @@
     "css-loader": "^6.11.0",
     "electron": "36.2.0",
     "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.4.0",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
     "node-loader": "^2.1.0",
+    "prettier": "^3.5.3",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",

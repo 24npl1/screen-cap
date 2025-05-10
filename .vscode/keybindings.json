@@ -1,0 +1,87 @@
+[
+  {
+    "key": "ctrl+d",
+    "command": "editor.action.deleteLines",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+delete",
+    "command": "editor.action.deleteLines",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "editor.action.deleteLines",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+h",
+    "command": "editor.action.deleteLeft",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "editor.action.deleteRight",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+u",
+    "command": "editor.action.deleteToLineStart",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "editor.action.deleteToLineEnd",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "editor.action.deleteWordLeft",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+w",
+    "command": "editor.action.deleteWordRight",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+a",
+    "command": "cursorHome",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+e",
+    "command": "cursorEnd",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+b",
+    "command": "cursorLeft",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+f",
+    "command": "cursorRight",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "cursorUp",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+n",
+    "command": "cursorDown",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+b",
+    "command": "cursorWordLeft",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+f",
+    "command": "cursorWordRight",
+    "when": "editorTextFocus"
+  }
+]

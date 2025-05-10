@@ -3,12 +3,27 @@ import type { Configuration } from 'webpack';
 import { rules } from './webpack.rules';
 import { plugins } from './webpack.plugins';
 
+rules.push({
+  test: /\.css$/,
+  use: [
+    'style-loader',
+    {
+      loader: 'css-loader',
+      options: {
+        importLoaders: 1,
+      },
+    },
+  ],
+})
+
 export const mainConfig: Configuration = {
   /**
    * This is the main entry point for your application, it's the first file
    * that runs in the main process.
    */
-  entry: './src/index.ts',
+  entry: {
+    index: './src/index.ts',
+  },
   // Put your normal webpack config below here
   module: {
     rules,
@@ -16,5 +31,13 @@ export const mainConfig: Configuration = {
   plugins,
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json'],
+    fallback: {
+      path: false,
+      fs: false,
+      util: false,
+      assert: false,
+      stream: false,
+      constants: false,
+    },
   },
-};
+}

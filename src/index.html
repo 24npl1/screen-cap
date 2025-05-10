@@ -2,10 +2,510 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Screen Recorder</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Screen Cap</title>
+    <style>
+      :root {
+        /* Modern tech color palette */
+        --primary-color: #3a86ff;
+        --primary-light: rgba(58, 134, 255, 0.2);
+        --primary-dark: #1a56a7;
+        --secondary-color: #8338ec;
+        --accent-color: #ff006e;
+        --success-color: #06d6a0;
+        --warning-color: #ffbe0b;
+        --danger-color: #ef476f;
+        
+        /* Background and UI colors */
+        --bg-dark: rgba(28, 32, 43, 0.85);
+        --bg-medium: rgba(40, 45, 60, 0.7);
+        --bg-light: rgba(58, 65, 86, 0.5);
+        
+        /* Text colors */
+        --text-primary: rgba(255, 255, 255, 0.95);
+        --text-secondary: rgba(255, 255, 255, 0.7);
+        --text-disabled: rgba(255, 255, 255, 0.4);
+        
+        /* UI elements */
+        --border-color: rgba(90, 100, 120, 0.4);
+        --border-width: 1px;
+        --border-radius-sm: 4px;
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --toolbar-height: 48px;
+        --toolbar-background: var(--bg-dark);
+        --toolbar-text: var(--text-primary);
+        --button-hover: var(--bg-light);
+        --button-active: var(--primary-light);
+        --divider-color: rgba(255, 255, 255, 0.15);
+        
+        /* Shadows */
+        --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.15);
+        --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.2);
+        --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.25);
+      }
+      
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        height: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      }
+      
+      body {
+        background-color: transparent;
+        color: var(--text-primary);
+      }
+      
+      /* App Styles */
+      .app {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        border: var(--border-width) solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        box-sizing: border-box;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        backdrop-filter: blur(8px);
+      }
+      
+      .titlebar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 32px;
+        background-color: var(--bg-dark);
+        -webkit-app-region: drag;
+        user-select: none;
+        position: relative;
+      }
+      
+      .titlebar-drag-region {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        -webkit-app-region: drag;
+      }
+      
+      .window-title {
+        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+      }
+      
+      .main-content {
+        flex-grow: 1;
+        position: relative;
+        background: transparent;
+      }
+      
+      /* Toolbar Styles */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--toolbar-height);
+        background-color: var(--toolbar-background);
+        padding: 0 16px;
+        transition: all 0.3s ease;
+        border-bottom: var(--border-width) solid var(--border-color);
+        position: relative;
+      }
+      
+      .toolbar.hidden {
+        transform: translateY(calc(-1 * var(--toolbar-height)));
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .toolbar-left {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        gap: 8px;
+        flex: 1;
+      }
+      
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-left: auto;
+      }
+      
+      .toolbar-title {
+        font-weight: 600;
+        margin-right: 12px;
+        font-size: 14px;
+        color: var(--text-primary);
+        letter-spacing: 0.5px;
+      }
+      
+      .toolbar-divider {
+        height: 60%;
+        width: 1px;
+        background-color: var(--divider-color);
+        margin: 0 8px;
+        opacity: 0.8;
+      }
+      
+      .toolbar-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 8px;
+        position: relative;
+      }
+      
+      .section-title {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      
+      .tool-buttons, .shape-buttons {
+        display: flex;
+        gap: 4px;
+      }
+      
+      .tool-button, .shape-button, .clear-button, .action-button {
+        background: var(--bg-light);
+        border: none;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 13px;
+        padding: 5px 10px;
+        border-radius: var(--border-radius-sm);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-sm);
+      }
+      
+      .window-button {
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 16px;
+        width: 28px;
+        height: 28px;
+        border-radius: var(--border-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      
+      .tool-button:hover, .shape-button:hover, .clear-button:hover, .action-button:hover, .window-button:hover {
+        background-color: var(--button-hover);
+        transform: translateY(-1px);
+      }
+      
+      .action-button {
+        background-color: var(--primary-light);
+        color: var(--primary-dark);
+        font-weight: 500;
+      }
+      
+      .tool-button.active, .shape-button.active {
+        background-color: var(--primary-color);
+        color: white;
+      }
+      
+      .clear-button {
+        background-color: var(--danger-color);
+        opacity: 0.8;
+        color: white;
+        margin-left: auto;
+      }
+      
+      .toolbar-toggle {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background-color: var(--bg-dark);
+        border: var(--border-width) solid var(--border-color);
+        border-radius: var(--border-radius-sm);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        box-shadow: var(--shadow-sm);
+        opacity: 0;
+        transition: all 0.2s ease;
+      }
+      
+      .toolbar-toggle::after {
+        content: "▲";
+        font-size: 12px;
+        color: var(--text-primary);
+      }
+      
+      .toolbar.hidden + .main-content .toolbar-toggle::after {
+        content: "▼";
+      }
+      
+      .main-content:hover .toolbar-toggle {
+        opacity: 1;
+      }
+      
+      .toolbar-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background-color: var(--primary-color);
+      }
+      
+      /* Color Picker Styles */
+      .color-picker-advanced {
+        position: relative;
+      }
+      
+      .color-picker-header {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: var(--border-radius-sm);
+        background-color: var(--bg-medium);
+        transition: background-color 0.2s;
+      }
+      
+      .color-picker-header:hover {
+        background-color: var(--bg-light);
+      }
+      
+      .active-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        margin-right: 5px;
+      }
+      
+      .expand-icon {
+        font-size: 10px;
+        color: var(--text-secondary);
+      }
+      
+      .color-grid {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin-top: 8px;
+        padding: 8px;
+        background: var(--bg-dark);
+        border-radius: var(--border-radius-md);
+        box-shadow: var(--shadow-md);
+        z-index: 100;
+        border: 1px solid var(--border-color);
+        animation: fade-in 0.2s ease;
+      }
+      
+      .color-swatch {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s ease;
+        position: relative;
+      }
+      
+      .color-swatch.active {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 2px var(--primary-color), 0 0 0 4px rgba(255, 255, 255, 0.2);
+        z-index: 1;
+      }
+      
+      .color-swatch:hover {
+        transform: scale(1.1);
+      }
+      
+      .color-swatch.custom-color {
+        background: linear-gradient(45deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+        background-size: 300% 300%;
+        animation: gradient-shift 5s ease infinite;
+      }
+      
+      .color-swatch.custom-color.expanded {
+        transform: scale(1.15);
+        box-shadow: 0 0 0 2px var(--primary-color), 0 0 0 4px rgba(255, 255, 255, 0.2);
+      }
+      
+      /* Canvas Styles */
+      .drawing-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        cursor: crosshair;
+      }
+      
+      .drawing-canvas.moving {
+        cursor: move;
+      }
+      
+      .drawing-canvas.erasing {
+        cursor: no-drop;
+      }
+      
+      .drawing-canvas.selecting {
+        cursor: default;
+      }
+      
+      .drawable-element {
+        pointer-events: none;
+      }
+      
+      .drawable-element.selected {
+        position: relative;
+        z-index: 10;
+      }
+      
+      .drawable-element.selected::after {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: -6px;
+        right: -6px;
+        bottom: -6px;
+        border: 2px dashed var(--primary-color);
+        border-radius: var(--border-radius-sm);
+        pointer-events: none;
+        box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+        animation: pulse 2s infinite;
+      }
+      
+      .text-input-container {
+        position: absolute;
+        z-index: 10;
+        border-radius: var(--border-radius-sm);
+        min-width: 150px;
+        min-height: 60px;
+        box-shadow: var(--shadow-md);
+        background: rgba(20, 25, 35, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+      }
+      
+      .text-input-container:hover {
+        box-shadow: var(--shadow-lg);
+      }
+      
+      .text-input-container:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2), var(--shadow-md);
+      }
+      
+      .text-input {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        resize: none;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.4;
+        padding: 10px;
+        color: var(--text-primary);
+        caret-color: var(--primary-color);
+      }
+      
+      .text-input::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.6;
+      }
+      
+      .text-resize-handle {
+        position: absolute;
+        right: 5px;
+        bottom: 5px;
+        width: 10px;
+        height: 10px;
+        cursor: nwse-resize;
+        opacity: 0.5;
+        transition: opacity 0.2s ease;
+      }
+      
+      .text-resize-handle::before {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 0 10px 10px;
+        border-color: transparent transparent var(--primary-color) transparent;
+      }
+      
+      .text-input-container:hover .text-resize-handle {
+        opacity: 0.9;
+      }
+      
+      .selection-rect {
+        border: 2px dashed var(--primary-color);
+        background-color: rgba(58, 134, 255, 0.1);
+        pointer-events: none;
+        z-index: 5;
+        border-radius: var(--border-radius-sm);
+        box-shadow: 0 0 0 1px rgba(58, 134, 255, 0.2);
+        backdrop-filter: blur(2px);
+      }
+      
+      .eraser-rect {
+        border: 2px dashed var(--danger-color);
+        background-color: rgba(239, 71, 111, 0.1);
+        box-shadow: 0 0 5px rgba(239, 71, 111, 0.3);
+        border-radius: var(--border-radius-sm);
+      }
+      
+      .text-rect {
+        border: 2px dashed var(--success-color);
+        background-color: rgba(6, 214, 160, 0.1);
+        box-shadow: 0 0 5px rgba(6, 214, 160, 0.3);
+        border-radius: var(--border-radius-sm);
+      }
+      
+      /* Animations */
+      @keyframes pulse {
+        0% { opacity: 0.8; }
+        50% { opacity: 0.5; }
+        100% { opacity: 0.8; }
+      }
+      
+      @keyframes fade-in {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+    </style>
   </head>
   <body>
-    <!-- App will be rendered here by React -->
+    <div id="root"></div>
   </body>
 </html>
