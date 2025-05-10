@@ -61,6 +61,29 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(8px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app-container.passthrough-mode {
+  border-color: rgba(150, 80, 255, 0.6);
+  box-shadow: 0 0 20px rgba(150, 80, 255, 0.3);
+}
+
+
+.passthrough-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(150, 80, 255, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-md);
+  font-size: 14px;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+  animation: pulse 2s infinite;
+  pointer-events: none;
 }
 
 .toolbar {
@@ -70,15 +93,19 @@ body {
   height: var(--toolbar-height);
   background-color: var(--toolbar-background);
   padding: 0 16px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   border-bottom: var(--border-width) solid var(--border-color);
   position: relative;
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto !important;
+  z-index: 1000;
 }
 
 .toolbar.hidden {
-  transform: translateY(calc(-1 * var(--toolbar-height)));
+  transform: translateY(-100%);
   opacity: 0;
-  visibility: hidden;
+  pointer-events: none;
 }
 
 .toolbar-left {
@@ -178,6 +205,18 @@ body {
 .tool-button.active, .shape-button.active {
   background-color: var(--primary-color);
   color: white;
+}
+
+/* Special styling for the passthrough button */
+.tool-button.passthrough-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+.tool-button.passthrough-button.active {
+  background-color: rgba(150, 80, 255, 0.6);
+  border: 1px solid rgba(150, 80, 255, 0.8);
+  animation: pulse 2s infinite;
 }
 
 .clear-button {
@@ -384,8 +423,16 @@ body {
   content: "▼";
 }
 
+
+.window-content.passthrough-content .toolbar-toggle,
 .window-content:hover .toolbar-toggle {
   opacity: 1;
+}
+
+.window-content.passthrough-content .toolbar-toggle {
+  background-color: rgba(150, 80, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 10px rgba(150, 80, 255, 0.5);
 }
 
 .toolbar-toggle:hover {
@@ -416,33 +463,49 @@ body {
   cursor: default;
 }
 
+.drawing-canvas.passthrough {
+  cursor: default;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+
+.drawing-canvas.passthrough:hover {
+  opacity: 0.5;
+}
+
 .drawable-element {
-  pointer-events: none;
-}
-
-.drawable-element.selected {
-  position: relative;
-  z-index: 10;
-}
-
-.drawable-element.selected::after {
-  content: '';
   position: absolute;
-  top: -6px;
-  left: -6px;
-  right: -6px;
-  bottom: -6px;
-  border: 2px dashed var(--primary-color);
-  border-radius: var(--border-radius-sm);
   pointer-events: none;
-  box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
-  animation: pulse 2s infinite;
 }
 
-@keyframes pulse {
-  0% { opacity: 0.8; }
-  50% { opacity: 0.5; }
-  100% { opacity: 0.8; }
+.drawable-element.selected svg,
+.drawable-element.selected div[style*="border:"] {
+  outline: 2px solid var(--primary-color);
+  animation: glow 1.5s ease-in-out infinite alternate;
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+.drawable-element.selected > div > div {
+  position: relative;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px var(--primary-color),
+                0 0 10px var(--primary-color),
+                0 0 15px var(--primary-color);
+  }
+  to {
+    box-shadow: 0 0 10px var(--primary-color),
+                0 0 20px var(--primary-color),
+                0 0 30px var(--primary-color);
+  }
+}
+
+
+.drawable-element.selected > div:has(svg) svg,
+.drawable-element.selected div[style*="border"] {
+  z-index: 1;
 }
 
 .text-input-container {
@@ -537,4 +600,54 @@ body {
   background-color: rgba(6, 214, 160, 0.1);
   box-shadow: 0 0 5px rgba(6, 214, 160, 0.3);
   border-radius: var(--border-radius-sm);
+}
+
+.passthrough-mode .toolbar {
+  background-color: var(--bg-dark);
+  box-shadow: var(--shadow-md);
+}
+
+.passthrough-mode .toolbar-button {
+  background-color: var(--bg-medium);
+}
+
+.passthrough-mode .toolbar-button:hover {
+  background-color: var(--bg-light);
+}
+
+.toolbar-only {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: var(--toolbar-background);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.toolbar-only .toolbar {
+  position: static;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+  background: var(--toolbar-background);
+  border: none;
+  box-shadow: none;
+}
+
+.toolbar-only .toolbar-button {
+  background: var(--button-hover);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toolbar-only .toolbar-button:hover {
+  background: var(--button-hover);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.toolbar-only .toolbar-button.active {
+  background: var(--button-active);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }

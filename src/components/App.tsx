@@ -1,57 +1,51 @@
-import React, { useState } from 'react';
-import Toolbar from './Toolbar';
-import ToolbarToggle from './ToolbarToggle';
-import DrawingCanvas from './DrawingCanvas';
-import { ToolType, ShapeType, DrawableElement } from '../types';
+import React, { useState } from 'react'
+import Toolbar from './Toolbar'
+import ToolbarToggle from './ToolbarToggle'
+import DrawingCanvas from './DrawingCanvas'
+import { ToolType, ShapeType, DrawableElement } from '../types'
 
 const App: React.FC = () => {
-  const [toolbarVisible, setToolbarVisible] = useState<boolean>(true);
-  const [activeTool, setActiveTool] = useState<ToolType>('shape');
-  const [activeShape, setActiveShape] = useState<ShapeType>('rectangle');
-  const [activeColor, setActiveColor] = useState<string>('#FF0000');
+  const [toolbarVisible, setToolbarVisible] = useState<boolean>(true)
+  const [activeTool, setActiveTool] = useState<ToolType>(ToolType.Shape)
+  const [activeShape, setActiveShape] = useState<ShapeType>(ShapeType.Rectangle)
+  const [activeColor, setActiveColor] = useState<string>('#FF0000')
 
   const toggleToolbar = (): void => {
-    const newVisibility = !toolbarVisible;
-    setToolbarVisible(newVisibility);
-    window.electronAPI.toggleToolbar(newVisibility);
-  };
+    const newVisibility = !toolbarVisible
+    setToolbarVisible(newVisibility)
+    window.electronAPI.toggleToolbar(newVisibility)
+  }
 
   const handleToolSelect = (tool: ToolType): void => {
-    setActiveTool(tool);
-  };
+    if (tool !== activeTool) {
+      setActiveTool(tool)
+      const shouldEnablePassthrough = tool === ToolType.PassThrough
+      window.electronAPI.togglePassthrough(shouldEnablePassthrough)
+    }
+  }
 
   const handleShapeSelect = (shape: ShapeType): void => {
-    setActiveShape(shape);
-  };
+    setActiveShape(shape)
+  }
 
   const handleColorSelect = (color: string): void => {
-    setActiveColor(color);
-  };
+    setActiveColor(color)
+  }
 
   const handleClearCanvas = (): void => {
-    // This will be implemented in the DrawingCanvas component
-    // We'll use a ref to trigger a clear action
-    const event = new CustomEvent('clear-canvas');
-    document.dispatchEvent(event);
-  };
-  
-  const handleAddCenterTextBox = (): void => {
-    // Create a text box in the center of the screen
-    const event = new CustomEvent('add-center-text');
-    document.dispatchEvent(event);
-    
-    // Switch to text tool
-    setActiveTool('text');
-  };
+    const event = new CustomEvent('clear-canvas')
+    document.dispatchEvent(event)
+  }
 
-  const handleElementSelect = (element: DrawableElement | null): void => {
-    // This function is for future implementation of element selection operations
-    console.log('Element selected:', element?.id);
-  };
+  const handleAddCenterTextBox = (): void => {
+    const event = new CustomEvent('add-center-text')
+    document.dispatchEvent(event)
+    setActiveTool(ToolType.Text)
+  }
 
   return (
-    <div className="app-container">
-      <Toolbar 
+    <div className={`app-container ${activeTool === ToolType.PassThrough ? 'passthrough-mode' : ''}`}>
+      <Toolbar
         isVisible={toolbarVisible}
         activeTool={activeTool}
         activeShape={activeShape}
@@ -62,20 +56,21 @@ const App: React.FC = () => {
         onClearCanvas={handleClearCanvas}
         onAddCenterText={handleAddCenterTextBox}
       />
-      <div className="window-content">
-        <ToolbarToggle 
-          isToolbarVisible={toolbarVisible} 
-          onToggleToolbar={toggleToolbar} 
-        />
+      <div className={`window-content ${activeTool === ToolType.PassThrough ? 'passthrough-content' : ''}`}>
+        <ToolbarToggle isToolbarVisible={toolbarVisible} onToggleToolbar={toggleToolbar} />
+        {activeTool === ToolType.PassThrough && (
+          <div className="passthrough-indicator">
+            Passthrough Mode Active - Click toolbar ghost button to exit
+          </div>
+        )}
         <DrawingCanvas
           activeTool={activeTool}
           activeShape={activeShape}
           activeColor={activeColor}
-          onSelectElement={handleElementSelect}
         />
       </div>
     </div>
-  );
-};
+  )
+}
+export default App
 
-export default App;

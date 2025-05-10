@@ -1,14 +1,14 @@
-import React from 'react';
-import { ToolbarToggleProps } from '../types';
+import React from 'react'
+import { ToolbarToggleProps } from '../types'
 
 const ToolbarToggle: React.FC<ToolbarToggleProps> = ({ isToolbarVisible, onToggleToolbar }) => {
   return (
-    <div 
-      className="toolbar-toggle" 
+    <div
+      className="toolbar-toggle"
       onClick={onToggleToolbar}
-      title={isToolbarVisible ? "Hide Toolbar" : "Show Toolbar"}
+      title={isToolbarVisible ? 'Hide Toolbar' : 'Show Toolbar'}
     />
-  );
-};
+  )
+}
 
-export default ToolbarToggle;
+export default ToolbarToggle
